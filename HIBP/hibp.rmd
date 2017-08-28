@@ -1,0 +1,58 @@
+---
+title: "Have I Been Pwned"
+author: "Jurij Robba"
+date: "July 30, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require('jsonlite')
+require('ggplot2')
+require('lubridate')
+```
+
+```{r data}
+
+data <- fromJSON('https://haveibeenpwned.com/api/v2/breaches')
+data$BreachDate <- as.POSIXct(data$BreachDate)
+data$AddedDate <- as.POSIXct(data$AddedDate)
+data$ModifiedDate <- as.POSIXct(data$ModifiedDate)
+```
+
+```{r size_of_breaches_over_time}
+
+ggplot(data=data, aes(x=BreachDate, y=PwnCount)) + geom_point(col = '#02B3E9', alpha = I(0.5), size=5) +
+  labs(x='Date', y='Pwn count', title = 'DATA BREACHES OVER TIME') +
+  theme(panel.background = element_rect(fill = 'black', colour = 'black'),
+    plot.background = element_rect(fill = 'black', colour = 'black'),
+    panel.grid = element_blank(),
+    axis.line = element_line(color = 'white'),
+    axis.text = element_text(color = 'white'),
+    title = element_text(color = 'white'),
+    plot.title = element_text(hjust = 0.5, vjust=2))
+
+with(data, lm(PwnCount ~ BreachDate))
+
+```
+
+
+```{r total_pwned}
+
+data$year <- year(data$BreachDate)
+by_year <- aggregate(data$PwnCount, by=list(data$year), FUN=sum)
+names(by_year)<- c('year', 'pwned')
+by_year$year <- as.integer(by_year$year)
+
+ggplot(by_year, aes(x=year, y=pwned)) + geom_bar(stat = 'identity', col = '#02B3E9', alpha = I(0.5)) +
+  labs(x='Date', y='Pwn count', title = 'DATA BREACHES OVER TIME') +
+  theme(panel.background = element_rect(fill = 'black', colour = 'black'),
+    plot.background = element_rect(fill = 'black', colour = 'black'),
+    panel.grid = element_blank(),
+    axis.line = element_line(color = 'white'),
+    axis.text = element_text(color = 'white'),
+    title = element_text(color = 'white'),
+    plot.title = element_text(hjust = 0.5, vjust=2)) +
+  geom_smooth(method="glm", method.args=list(family=gaussian(link="log")), col='#02B3E9')
+
+```

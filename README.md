@@ -10,3 +10,11 @@ from [bitcoincharts](https://bitcoincharts.com/charts/bitstampUSD#igDailyztgSzm1
 ## Dash
 
 Plots Bitcoin and Dash price on same time scale showing similarity in price movements
+
+## HIBP
+
+Playing with data from HaveIBeenPwned
+
+## CppFor
+
+Timing c++ loops
